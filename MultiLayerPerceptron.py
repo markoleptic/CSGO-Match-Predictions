@@ -13,6 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
+from utils import encode_labels
 
 #df80 = data.head(int(len(data)*0.8))
 #df20 = data.tail(int(len(data)*0.2))
@@ -66,17 +67,13 @@ newFeatures1mapnosideorteam = [
     "map",
 ]
 
-def encodeLabel(X, labels):
-    le = LabelEncoder()
-    for label in labels:
-        X[label] = le.fit_transform(np.array(X.loc[:,[label]]).ravel())
-    return X
+
 
 X = data.loc[:, newFeatures]
 y = data.loc[:,['winner']]
 
-labelsToEncode = ['team_1', 'team_2,', 't1_side', 't2_side']
-X = encodeLabel(X, labelsToEncode)
+X = encode_labels(X, ['team_1', 'team_2,', 't1_side', 't2_side'])
+
 
 scaler = StandardScaler()
 X = scaler.fit_transform(X)

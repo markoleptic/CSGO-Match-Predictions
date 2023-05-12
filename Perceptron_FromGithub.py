@@ -281,8 +281,6 @@ X = data.loc[:, tinyFeatures]
 #y = data.loc[:, matchWinOutcome]
 y = data.loc[:, outcome]
 
-
-
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 

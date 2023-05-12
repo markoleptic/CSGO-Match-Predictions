@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-
+from utils import calculate_FPR_TPR, plot_ROC_curve, encode_labels, plot_coefficents_curve, plot_All_coefficents_curve
 
 class Perceptron:
     def __init__(self, learning_rate=0.001, num_iterations=1000, batch_size=5):
@@ -76,112 +76,23 @@ class Perceptron:
             loss += hinge_loss
         print(np.mean(loss / X.shape[0]))
         return np.mean(loss / X.shape[0])
-
-# data preprocessing
-features = [
-    "t1_money",
-    "t2_money",
-    "t1_rank",
-    "t2_rank",
-    "map_0",
-    "map_1",
-    "map_2",
-    "map_3",
-    "map_4",
-    "map_5",
-    "map_6",
-    "map_7",
-    "map_8",
-    "map_9",
-]
-newFeatures = [
-    "team_1",
-    "team_2",
-    "t1_side",
-    "t2_side",
-    "t1_money",
-    "t2_money",
-    "t1_rank",
-    "t2_rank",
-    "map_0",
-    "map_1",
-    "map_2",
-    "map_3",
-    "map_4",
-    "map_5",
-    "map_6",
-    "map_7",
-    "map_8",
-    "map_9",
-]
-matchWinOutcome = ["match_winner"]
-outcome = ["winner"]
-featuresNoMap = ["t1_money", "t2_money", "t1_rank", "t2_rank"]
-
-data = pd.read_csv("roundMoneyWinners2.csv", header=0, index_col=False)
-data = pd.get_dummies(data, columns=["map"])
-print(data)
-
-# split into features and outcomes
-#X = data.loc[:, features]
-X = data.loc[:, newFeatures]
-#y = data.loc[:, matchWinOutcome]
-y = data.loc[:, outcome]
-
-le = LabelEncoder()
-X['team_1'] = le.fit_transform(np.array(X.loc[:,['team_1']]).ravel())
-X['team_2'] = le.fit_transform(np.array(X.loc[:,['team_2']]).ravel())
-X['t1_side'] = le.fit_transform(np.array(X.loc[:,['t1_side']]).ravel())
-X['t2_side'] = le.fit_transform(np.array(X.loc[:,['t2_side']]).ravel())
-
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
-X = np.array(X)
-y = np.array(y).ravel()
-
-# convert binary outcome to -1 or 1
-y[y == 1] = 1
-y[y == 2] = -1
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-
-# train the model
-perceptron = Perceptron()
-weights = perceptron.fit(X_train, y_train)
-print(f"Weights: {weights}")
-
-# use the trained model to make predictions
-predictions = perceptron.predict(X_test)
-print(predictions)
-
-count = np.count_nonzero(predictions == -1)
-print(count, predictions.__len__())
-y_pred = perceptron.predict(X_test)
-
-# calculate FPR and TPR for different probability thresholds
-tpr_list = []
-fpr_list = []
-for threshold in np.arange(0, 1, 0.01):
-    y_prob = perceptron.predict_proba(X_test, threshold)
-    y_pred = np.where(y_prob >= threshold, 1, -1)
-    tp = np.sum((y_test == 1) & (y_pred == 1))
-    tn = np.sum((y_test == -1) & (y_pred == -1))
-    fp = np.sum((y_test == -1) & (y_pred == 1))
-    fn = np.sum((y_test == 1) & (y_pred == -1))
-    tpr = tp / (tp + fn)
-    fpr = fp / (fp + tn)
-    tpr_list.append(tpr)
-    fpr_list.append(fpr)
-
-# plot the ROC curve
-plt.plot(fpr_list, tpr_list)
-plt.plot([0, 1], [0, 1], linestyle='--')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('ROC Curve')
-plt.show()
-
-# print accuracy of predictions
-accuracy = accuracy_score(y_test, predictions)
-print(f"Accuracy: {accuracy}")
+    
+    def pre_process(self, features, predict_outcome = ["winner"], 
+                    use_dummies = True, use_scalar = True, 
+                    filePath = "roundMoneyWinners2.csv",
+                    labels_to_encode = ['team_1', 'team_2', 't1_side', 't2_side'],
+                    train_size = 0.25):
+        data = pd.read_csv("roundMoneyWinners2.csv", header=0, index_col=False)
+        if use_dummies:
+            data = pd.get_dummies(data, columns=["map"])
+        X = data.loc[:, features]
+        X = encode_labels(X, labels_to_encode)
+        if use_scalar:
+            scaler = StandardScaler()
+            X = scaler.fit_transform(X)
+        X = np.array(X)
+        y = data.loc[:, predict_outcome]
+        y = np.array(y).ravel()
+        y[y == 1] = -1
+        y[y == 2] = 1
+        return train_test_split(X, y, random_state = 0, train_size = train_size)

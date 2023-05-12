@@ -145,7 +145,6 @@ values.append((abs(coef[4])+abs(coef[5])) / 2)
 values.append((abs(coef[6])+abs(coef[7])) / 2)
 values.append((np.mean(abs(coef[8:17]))/(17-8)))
 
-svc_disp = RocCurveDisplay.from_estimator(clf, X_test, y_test)
 plt.ylabel(ylabel="True Positive Rate")
 plt.xlabel(xlabel="False Positive Rate")
 plt.legend('', frameon=False)
