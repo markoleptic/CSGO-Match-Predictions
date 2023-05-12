@@ -1,11 +1,10 @@
 import numpy as np
-from scipy.stats import mode
 import math
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
+from scipy.stats import mode
 import matplotlib.pyplot as plt
 from utils import encode_labels
 
@@ -120,7 +119,6 @@ class RandomForest:
         
     def fit(self, X, y):
         for i in range(self.n_estimators):
-            print(i)
             tree = DecisionTree(max_depth=self.max_depth)
             # Randomly select a subset of features for each tree
             indices = np.random.choice(X.shape[1], size=int(np.sqrt(X.shape[1])), replace=False)
@@ -153,3 +151,5 @@ class RandomForest:
         y[y == 1] = 0
         y[y == 2] = 1
         return train_test_split(X, y, random_state = 0, train_size = train_size)
+
+

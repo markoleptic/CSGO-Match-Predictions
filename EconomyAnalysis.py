@@ -82,6 +82,7 @@ for index, row in df.iterrows():
 newdf = pd.DataFrame(
     tempdict,
     columns=[
+        "round_number",
         "team_1",
         "team_2",
         "t1_side",

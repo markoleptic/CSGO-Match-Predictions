@@ -2,11 +2,10 @@ import numpy as np
 import math
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
-from utils import calculate_FPR_TPR, plot_ROC_curve, encode_labels, plot_coefficents_curve, plot_All_coefficents_curve
+from utils import encode_labels
 
 class Perceptron:
     def __init__(self, learning_rate=0.001, num_iterations=1000, batch_size=5):

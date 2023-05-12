@@ -63,67 +63,23 @@ newFeatures1mapnoteamorsides = [
     "map",
 ]
 
-#features = ['t1_money', 't2_money', 't1_rank', 't2_rank']
 X = data.loc[:, newFeatures]
 y = data.loc[:,['winner']]
-#y = data.loc[:,['match_winner']]
 
 le = LabelEncoder()
 # X['map'] = le.fit_transform(np.array(X.loc[:,['map']]).ravel())
-
 X['team_1'] = le.fit_transform(np.array(X.loc[:,['team_1']]).ravel())
 X['team_2'] = le.fit_transform(np.array(X.loc[:,['team_2']]).ravel())
 X['t1_side'] = le.fit_transform(np.array(X.loc[:,['t1_side']]).ravel())
 X['t2_side'] = le.fit_transform(np.array(X.loc[:,['t2_side']]).ravel())
 
-#X.loc[:,['match_winner']] = le.fit_transform(X.loc[:,['match_winner']])
-
 scaler = StandardScaler()
 #X = scaler.fit_transform(X)
 X = np.array(X)
-y = np.array(y)
-#y = le.fit_transform(np.array(y).ravel())
+y = np.array(y).ravel()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
-# mlp_clf = MLPClassifier(verbose=True)
-# mlp_clf.fit(X_train,y_train)
-# predictions = mlp_clf.predict(X_test)
-# print(mlp_clf.get_params())
-# print(mlp_clf.score(X_train,y_train))
-# print(mlp_clf.coef_)
-# print(mlp_clf.loss_function_)
-# print(classification_report(y_test, predictions))
-# svc_disp = RocCurveDisplay.from_estimator(mlp_clf, X_test, y_test)
-# plt.ylabel(ylabel="True Positive Rate")
-# plt.xlabel(xlabel="False Positive Rate")
-# plt.legend('', frameon=False)
-# plt.show()
-
-# exit()
-from sklearn.naive_bayes import BernoulliNB
-from sklearn.naive_bayes import ComplementNB
-from sklearn.naive_bayes import MultinomialNB
-# nb = BernoulliNB()
-# mb = MultinomialNB()
-# cb = ComplementNB()
-# nb.fit(X_train,y_train)
-# mb.fit(X_train,y_train)
-# cb.fit(X_train,y_train)
-# predictions = mb.predict(X_test)
-# predictions = cb.predict(X_test)
-# predictions = nb.predict(X_test)
-# print(mb.score(X_test,y_test))
-# print(cb.score(X_test,y_test))
-# print(nb.score(X_test,y_test))
-# exit()
-
-lr = LogisticRegression()
-lr.fit(X_train, y_train)
-predictions = lr.predict(X_test)
-print(lr.get_params())
-print(lr.score(X_test,y_test))
-exit()
 clf = Perceptron(verbose=False)
 clf.fit(X_train,y_train)
 predictions = clf.predict(X_test)
@@ -132,6 +88,7 @@ print(clf.get_params())
 print(clf.score(X_test,y_test))
 print(clf.coef_)
 print(classification_report(y_test, predictions))
+
 svc_disp = RocCurveDisplay.from_estimator(clf, X_test, y_test)
 plt.ylabel(ylabel="True Positive Rate")
 plt.xlabel(xlabel="False Positive Rate")
@@ -144,7 +101,6 @@ values.append((abs(coef[2])+abs(coef[3])) / 2)
 values.append((abs(coef[4])+abs(coef[5])) / 2)
 values.append((abs(coef[6])+abs(coef[7])) / 2)
 values.append((np.mean(abs(coef[8:17]))/(17-8)))
-
 plt.ylabel(ylabel="True Positive Rate")
 plt.xlabel(xlabel="False Positive Rate")
 plt.legend('', frameon=False)

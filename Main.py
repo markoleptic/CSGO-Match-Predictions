@@ -1,11 +1,12 @@
 from sklearn.metrics import accuracy_score
-from utils import calculate_FPR_TPR, plot_ROC_curve, plot_coefficents_curve, plot_All_coefficents_curve
+from utils import calculate_FPR_TPR, plot_ROC_curve, plot_coefficents_chart, plot_All_coefficents_chart
 from RandomForest import RandomForest
 from Perceptron import Perceptron
 import numpy as np
 import math
 
 Features = [
+    "round_number",
     "team_1",
     "team_2",
     "t1_side",
@@ -31,7 +32,7 @@ Features = [
 # ----------- #
 
 forest = RandomForest()
-X_train_rf, X_test_rf, y_train_rf, y_test_rf = forest.pre_process(Features)
+X_train_rf, X_test_rf, y_train_rf, y_test_rf = forest.pre_process(Features, use_scalar=False)
 forest.fit(X_train_rf, y_train_rf)
 
 # use the trained model to make predictions
@@ -40,7 +41,7 @@ print(predictions_rf, y_test_rf)
 accuracy = accuracy_score(y_test_rf, predictions_rf)
 
 print(f"Accuracy: {accuracy}")
-count = np.count_nonzero(predictions_rf == -1)
+count = np.count_nonzero(predictions_rf == 1)
 print(count, predictions_rf.__len__())
 
 
@@ -74,4 +75,4 @@ values.append(np.sum(weights[8:17]) / (17-8))
 print(values)
 values = values / np.linalg.norm(values)
 features = ['Team Name','Side (CT/T)', 'Money', 'Team Rank', 'Map']
-plot_coefficents_curve(features, values)
+plot_coefficents_chart(features, values)
