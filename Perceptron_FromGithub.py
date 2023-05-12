@@ -192,7 +192,7 @@ class LogisticLoss():
     def hess(self, y, y_pred):
         p = self.log_func(y_pred)
         return p * (1 - p)
-N
+
 class Perceptron():
     """The Perceptron. One layer neural network classifier.
     Parameters:

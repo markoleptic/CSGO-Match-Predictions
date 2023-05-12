@@ -81,7 +81,6 @@ X = encodeLabel(X, labelsToEncode)
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 X = np.array(X)
-y = le.fit_transform(np.array(y).ravel())
 
 # convert binary outcome to 0 or 1
 y[y == 1] = 0
