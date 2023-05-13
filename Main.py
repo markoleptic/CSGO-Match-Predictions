@@ -15,36 +15,30 @@ Features = [
     "t2_money",
     "t1_rank",
     "t2_rank",
-    "map_0",
-    "map_1",
-    "map_2",
-    "map_3",
-    "map_4",
-    "map_5",
-    "map_6",
-    "map_7",
-    "map_8",
-    "map_9",
+    "map"
 ]
 
 # ----------- #
 # Random Forest
 # ----------- #
 
-forest = RandomForest()
-X_train_rf, X_test_rf, y_train_rf, y_test_rf = forest.pre_process(Features, use_scalar=False)
-forest.fit(X_train_rf, y_train_rf)
+forest = RandomForest(n_estimators = 10, max_features = "number", max_features_num = 3, max_depth = 10, min_samples_split = 2, min_samples_leaf = 1)
+
+X_train, X_test, y_train, y_test = forest.pre_process(Features, use_scalar=False)
+
+forest.fit(X_train, y_train)
 
 # use the trained model to make predictions
-predictions_rf = forest.predict(X_test_rf)
-print(predictions_rf, y_test_rf)
-accuracy = accuracy_score(y_test_rf, predictions_rf)
+predictions_rf = forest.predict(X_test)
+print(predictions_rf)
+print(predictions_rf, y_test)
+accuracy = accuracy_score(y_test, predictions_rf)
 
 print(f"Accuracy: {accuracy}")
 count = np.count_nonzero(predictions_rf == 1)
 print(count, predictions_rf.__len__())
 
-
+exit()
 # --------- #
 # Perceptron
 # --------- #
