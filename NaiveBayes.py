@@ -29,7 +29,7 @@ class NaiveBayes:
             self.class_means[i, :] = np.mean(X_c, axis=0)
             self.class_variances[i, :] = np.var(X_c, axis=0)
 
-    def gaussian_pdf(self, X, mean, variance):
+    def gaussian_pd(self, X, mean, variance):
         # Compute the Gaussian probability density function for each feature
         return np.exp(-(X - mean)**2 / (2 * variance)) / np.sqrt(2 * np.pi * variance)
     
@@ -39,7 +39,7 @@ class NaiveBayes:
         for i in range(len(self.class_priors)):
             prior = np.log(self.class_priors[i])
             self.class_variances[i] += 1e-9
-            likelihood = np.sum(np.log(self.gaussian_pdf(X, self.class_means[i], self.class_variances[i])), axis=1)
+            likelihood = np.sum(np.log(self.gaussian_pd(X, self.class_means[i], self.class_variances[i])), axis=1)
             log_likelihoods.append(prior + likelihood)
         log_likelihoods = np.array(log_likelihoods).T
 
@@ -52,16 +52,11 @@ class NaiveBayes:
     
     def pre_process(self, features, outcome = ["winner"]):
         # data preprocessing
-        featuresNoMap = ["t1_money", "t2_money", "t1_rank", "t2_rank"]
-
         data = pd.read_csv("roundMoneyWinners2.csv", header=0, index_col=False)
         data = pd.get_dummies(data, columns=["map"])
         print(data)
 
-        # split into features and outcomes
-        #X = data.loc[:, features]
         X = data.loc[:, features]
-        #y = data.loc[:, matchWinOutcome]
         y = data.loc[:, outcome]
 
         le = LabelEncoder()
