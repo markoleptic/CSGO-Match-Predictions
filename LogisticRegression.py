@@ -39,7 +39,7 @@ class LogisticRegression:
     def predict_proba(self, X, threshold=0):
         linear_output = np.dot(X, self.weights) + self.bias
         probabilities = 1 / (1 + np.exp(-linear_output))
-        return np.where(probabilities >= threshold, 1, -1)
+        return np.where(probabilities >= threshold, 1, 0)
     
     def accuracy(self, y_true, y_pred):
         accuracy = np.mean(y_true == y_pred)

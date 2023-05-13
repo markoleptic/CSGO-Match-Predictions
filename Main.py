@@ -15,21 +15,39 @@ Features = [
     "t2_money",
     "t1_rank",
     "t2_rank",
-    "map"
+    "map_0",
+    "map_1",
+    "map_2",
+    "map_3",
+    "map_4",
+    "map_5",
+    "map_6",
+    "map_7",
+    "map_8",
+    "map_9",
 ]
 
 # ----------- #
 # Random Forest
 # ----------- #
 
-forest = RandomForest(n_estimators = 10, max_features = "number", max_features_num = 3, max_depth = 10, min_samples_split = 2, min_samples_leaf = 1)
+forest = RandomForest(n_estimators = 50, max_features = "number", max_features_num=3, max_depth = 15, min_samples_split = 2, min_samples_leaf = 1)
 
-X_train, X_test, y_train, y_test = forest.pre_process(Features, use_scalar=False)
+X_train, X_test, y_train, y_test = forest.pre_process(Features, labels_to_encode=['team_1', 'team_2', 't1_side', 't2_side'], use_scalar=True)
 
 forest.fit(X_train, y_train)
 
 # use the trained model to make predictions
 predictions_rf = forest.predict(X_test)
+print(predictions_rf)
+print(predictions_rf, y_test)
+accuracy = accuracy_score(y_test, predictions_rf)
+
+print(f"Accuracy: {accuracy}")
+count = np.count_nonzero(predictions_rf == 1)
+print(count, predictions_rf.__len__())
+
+predictions_rf = forest.predict_proba(X_test)
 print(predictions_rf)
 print(predictions_rf, y_test)
 accuracy = accuracy_score(y_test, predictions_rf)

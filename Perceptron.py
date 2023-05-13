@@ -34,17 +34,7 @@ class Perceptron:
             # update the weights and bias
             self.weights -= self.learning_rate * dw
             self.bias -= self.learning_rate * db
-
         return self.weights
-
-    def binary_cross_entropy_loss(self, X, y, weights, bias):
-        loss = 0
-        for i in range(X.shape[0]):
-            linear_output = np.dot(X[i], weights) + bias
-            sigmoid_output = 1 / (1 + np.exp(-linear_output))
-            current_loss = -(y[i] * np.log(sigmoid_output) + (1 - y[i]) * np.log(1 - sigmoid_output))
-            loss += current_loss
-        return np.mean(loss / X.shape[0])
 
     def predict(self, X):
         linear_output = np.dot(X, self.weights) + self.bias
@@ -59,22 +49,6 @@ class Perceptron:
         dw = (1 / X.shape[0]) * np.dot(X.T, y_predicted - y)
         db = (1 / X.shape[0]) * np.sum(y_predicted - y)
         return dw, db
-
-    def compute_loss(self, y_predicted, y_batch):
-        eps = 1e-15
-        return np.mean(
-            -y_batch * np.log(y_predicted + eps)
-            - (1 - y_batch) * np.log(1 - y_predicted + eps)
-        )
-
-    def compute_hinge_loss(self, X, y):
-        loss = 0
-        for i in range(X.shape[0]):
-            linear_output = np.dot(X[i], self.weights) + self.bias
-            hinge_loss = max(0, 1 - y[i] * linear_output)
-            loss += hinge_loss
-        print(np.mean(loss / X.shape[0]))
-        return np.mean(loss / X.shape[0])
     
     def pre_process(self, features, predict_outcome = ["winner"], 
                     use_dummies = True, use_scalar = True, 

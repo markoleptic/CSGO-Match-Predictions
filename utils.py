@@ -38,6 +38,19 @@ def plot_ROC_curve(fpr_list, tpr_list):
     plt.ylabel('True Positive Rate')
     plt.show()
 
+def plot_All_ROC_curve(fpr_lists, tpr_lists, algos):
+    """
+    plot multi ROC curve using values obtained from calculate_FPR_TPR
+    """
+    colors = cm.rainbow(np.linspace(0, 1, features.__len__()))
+    for fpr, tpr, algo in zip(algos, fpr_lists, tpr_lists, colors):
+        plt.plot(fpr_list, tpr_list, color = color, label = algo)
+    plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.legend()
+    plt.show()
+
 def plot_coefficents_chart(features, values):
     """
     Plots the weighting of the features / coefficients.\n
@@ -76,7 +89,7 @@ def plot_All_coefficents_chart(features, algos, valuesArray):
         align = 'edge')
     plt.ylabel(ylabel = "Feature Weight (normalized)")
     plt.xlabel(xlabel = "Coefficients (combined)")
-    plt.xticks(index + (bar_width * algos.__len__() / 2), features)
+    plt.xticks(index + (bar_width * algos.__len__() / 2), features, rotation=45)
     plt.legend()
     plt.tight_layout()
     plt.show()
