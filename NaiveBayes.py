@@ -29,11 +29,16 @@ class NaiveBayes:
             self.class_means[i, :] = np.mean(X_c, axis=0)
             self.class_variances[i, :] = np.var(X_c, axis=0)
 
+    def gaussian_pdf(self, X, mean, variance):
+        # Compute the Gaussian probability density function for each feature
+        return np.exp(-(X - mean)**2 / (2 * variance)) / np.sqrt(2 * np.pi * variance)
+    
     def predict(self, X):
         # Compute the log-likelihoods
         log_likelihoods = []
         for i in range(len(self.class_priors)):
             prior = np.log(self.class_priors[i])
+            self.class_variances[i] += 1e-9
             likelihood = np.sum(np.log(self.gaussian_pdf(X, self.class_means[i], self.class_variances[i])), axis=1)
             log_likelihoods.append(prior + likelihood)
         log_likelihoods = np.array(log_likelihoods).T
@@ -41,86 +46,38 @@ class NaiveBayes:
         # Return the class with the highest log-likelihood for each sample
         return np.argmax(log_likelihoods, axis=1)
 
-    def gaussian_pdf(self, X, mean, variance):
-        # Compute the Gaussian probability density function for each feature
-        return np.exp(-(X - mean)**2 / (2 * variance)) / np.sqrt(2 * np.pi * variance)
+    def accuracy(self, y_true, y_pred):
+        accuracy = np.mean(y_true == y_pred)
+        return accuracy
     
+    def pre_process(self, features, outcome = ["winner"]):
+        # data preprocessing
+        featuresNoMap = ["t1_money", "t2_money", "t1_rank", "t2_rank"]
 
+        data = pd.read_csv("roundMoneyWinners2.csv", header=0, index_col=False)
+        data = pd.get_dummies(data, columns=["map"])
+        print(data)
 
-# data preprocessing
-features = [
-    "t1_money",
-    "t2_money",
-    "t1_rank",
-    "t2_rank",
-    "map_0",
-    "map_1",
-    "map_2",
-    "map_3",
-    "map_4",
-    "map_5",
-    "map_6",
-    "map_7",
-    "map_8",
-    "map_9",
-]
-newFeatures = [
-    "team_1",
-    "team_2",
-    "t1_side",
-    "t2_side",
-    "t1_money",
-    "t2_money",
-    "t1_rank",
-    "t2_rank",
-    "map_0",
-    "map_1",
-    "map_2",
-    "map_3",
-    "map_4",
-    "map_5",
-    "map_6",
-    "map_7",
-    "map_8",
-    "map_9",
-]
-matchWinOutcome = ["match_winner"]
-outcome = ["winner"]
-featuresNoMap = ["t1_money", "t2_money", "t1_rank", "t2_rank"]
+        # split into features and outcomes
+        #X = data.loc[:, features]
+        X = data.loc[:, features]
+        #y = data.loc[:, matchWinOutcome]
+        y = data.loc[:, outcome]
 
-data = pd.read_csv("roundMoneyWinners2.csv", header=0, index_col=False)
-data = pd.get_dummies(data, columns=["map"])
-print(data)
+        le = LabelEncoder()
+        X['team_1'] = le.fit_transform(np.array(X.loc[:,['team_1']]).ravel())
+        X['team_2'] = le.fit_transform(np.array(X.loc[:,['team_2']]).ravel())
+        X['t1_side'] = le.fit_transform(np.array(X.loc[:,['t1_side']]).ravel())
+        X['t2_side'] = le.fit_transform(np.array(X.loc[:,['t2_side']]).ravel())
 
-# split into features and outcomes
-#X = data.loc[:, features]
-X = data.loc[:, newFeatures]
-#y = data.loc[:, matchWinOutcome]
-y = data.loc[:, outcome]
+        scaler = StandardScaler()
+        X = scaler.fit_transform(X)
 
-le = LabelEncoder()
-X['team_1'] = le.fit_transform(np.array(X.loc[:,['team_1']]).ravel())
-X['team_2'] = le.fit_transform(np.array(X.loc[:,['team_2']]).ravel())
-X['t1_side'] = le.fit_transform(np.array(X.loc[:,['t1_side']]).ravel())
-X['t2_side'] = le.fit_transform(np.array(X.loc[:,['t2_side']]).ravel())
+        X = np.array(X)
+        y = np.array(y).ravel()
 
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
+        # convert binary outcome to -1 or 1
+        y[y == 1] = 0
+        y[y == 2] = 1
 
-X = np.array(X)
-y = np.array(y).ravel()
-
-# convert binary outcome to -1 or 1
-y[y == 1] = 0
-y[y == 2] = 1
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-
-# train the model
-model = NaiveBayes()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-print(predictions)
-# print accuracy of predictions
-accuracy = accuracy_score(y_test, predictions)
-print(f"Accuracy: {accuracy}")
+        return train_test_split(X, y, random_state=0)
