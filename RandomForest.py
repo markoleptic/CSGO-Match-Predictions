@@ -18,9 +18,11 @@ class DecisionTree:
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
         self.feature_labels = []
+        self.indices = None
 
-    def fit(self, X, y, feature_labels):
+    def fit(self, X, y, feature_labels, indices):
         self.feature_labels = feature_labels
+        self.indices = indices
         if self.verbose:
             print(f'Fitting tree with {X.shape[1]} features and {X.shape[0]} samples.')
         self.tree = self.build_tree(X, y, depth=0)
@@ -188,12 +190,11 @@ class RandomForest:
 
             X_bootstrap, y_bootstrap = self.bootstrap_sampling(X, y)
             X_bootstrap = X_bootstrap[:, indices]
-            tree.fit(X_bootstrap, y_bootstrap, [self.feature_labels[i] for i in indices])
+            tree.fit(X_bootstrap, y_bootstrap, [self.feature_labels[i] for i in indices], indices)
             self.trees.append(tree)
             self.n_nodes_list.append(tree.tree.count_nodes(tree.tree))
             if self.verbose:
                print(f'Tree {i} has {self.get_num_nodes(tree.tree)} nodes.')
-
 
     def bootstrap_sampling(self, X, y):
         """
@@ -206,26 +207,28 @@ class RandomForest:
     
     def get_indices(self, X):
         # Randomly select a subset of features for each tree
-        indices = np.random.choice(X.shape[1], size=self.max_features_num, replace=False)
         if self.max_features == 'sqrt':
             indices = np.random.choice(X.shape[1], size=int(np.sqrt(X.shape[1])), replace=False)
         elif self.max_features == 'log2':
             indices = np.random.choice(X.shape[1], size=int(np.log2(X.shape[1])), replace=False)
+        elif self.max_features_num > 0:
+            indices = np.random.choice(X.shape[1], size=self.max_features_num, replace=False)
+        else:
+            indices = np.arange(X.shape[1])
         return indices
 
-    def predict_proba(self, X):
-        predictions = np.zeros((X.shape[0], len(self.trees)))
+    def predict_proba(self, X, threshold):
+        probabilities = np.zeros((X.shape[0], len(self.trees)))
         for i, tree in enumerate(self.trees):
-            indices = self.get_indices(X)
-            predictions[:, i] = tree.predict_proba(X[:, indices])[:, 1] 
-        avg_predictions = np.mean(predictions, axis=1)
-        binary_predictions = np.round(avg_predictions).astype(int)
-        return binary_predictions
+            indices = tree.indices
+            probabilities[:, i] = tree.predict_proba(X[:, indices])[:, 1] 
+        avg_predictions = np.mean(probabilities, axis=1)
+        return np.where(probabilities >= threshold, 1, 0)
 
     def predict(self, X):
         predictions = np.zeros((X.shape[0], len(self.trees)))
         for i, tree in enumerate(self.trees):
-            indices = self.get_indices(X)
+            indices = tree.indices
             predictions[:, i] = tree.predict(X[:, indices])
         avg_predictions = np.mean(predictions, axis=1)
         binary_predictions = np.round(avg_predictions).astype(int)

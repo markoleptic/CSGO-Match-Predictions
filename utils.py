@@ -34,21 +34,21 @@ def plot_ROC_curve(fpr_list, tpr_list):
     """
     plt.plot(fpr_list, tpr_list)
     plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.title("ROC Curve")
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.show()
 
-def plot_All_ROC_curve(fpr_lists, tpr_lists, algos):
-    """
-    plot multi ROC curve using values obtained from calculate_FPR_TPR
-    """
-    colors = cm.rainbow(np.linspace(0, 1, features.__len__()))
-    for fpr, tpr, algo in zip(algos, fpr_lists, tpr_lists, colors):
-        plt.plot(fpr_list, tpr_list, color = color, label = algo)
+def plot_all_ROC_curve(tpr_lists, fpr_lists, algos):
+    colors = cm.rainbow(np.linspace(0, 1, 6))
+    for algo, fpr, tpr, color in zip(algos, fpr_lists, tpr_lists, colors):
+        plt.plot(fpr, tpr, color = color, label=algo)
     plt.plot([0, 1], [0, 1], linestyle='--')
+    plt.title("ROC Curve")
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.legend()
+    plt.legend(loc="upper left")
+    plt.rcParams['figure.figsize'] = [8, 8]
     plt.show()
 
 def plot_coefficents_chart(features, values):
@@ -68,12 +68,13 @@ def plot_coefficents_chart(features, values):
     plot_coefficents_curve(features, values) 
     """
     plt.bar(features, values, align='center', alpha=0.9)
+    plt.title("Coefficients (combined) vs Feature Weight (normalized)")
     plt.ylabel(ylabel = "Feature Weight (normalized)")
     plt.xlabel(xlabel = "Coefficients (combined)")
     plt.legend('', frameon=False)
     plt.show()
 
-def plot_All_coefficents_chart(features, algos, valuesArray):
+def plot_all_coefficents_chart(features, algos, valuesArray):
     """
     Plots weighting of the features / coefficients for multiple algos
     """
@@ -87,6 +88,7 @@ def plot_All_coefficents_chart(features, algos, valuesArray):
         color = color,
         label = algo,
         align = 'edge')
+    plt.title("Coefficients (combined) vs Feature Weight (normalized)")
     plt.ylabel(ylabel = "Feature Weight (normalized)")
     plt.xlabel(xlabel = "Coefficients (combined)")
     plt.xticks(index + (bar_width * algos.__len__() / 2), features, rotation=45)
